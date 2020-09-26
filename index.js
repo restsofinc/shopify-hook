@@ -12,9 +12,10 @@ app.use(bodyParser.urlencoded({
   extended: true,
 }));
 
-app.get('/', (req, res) => {
-  res.status(200).send('Welcome to Shopify plugin');
-})
+app.get('/', function(req, res) {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 
 app.get('/test', (req, res) => {
   res.status(200).send('Welcome to plugin');
