@@ -4,6 +4,8 @@ const getRawBody = require('raw-body')
 const crypto = require('crypto')
 const secretKey = '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'
 var request = require('request');
+const path = require('path');
+
 const app = express()
 
 
@@ -60,7 +62,7 @@ app.post('/webhooks/order/create', async (req, res) => {
   //res.sendStatus(200)
 })
 
-app.listen(3000, () => console.log('Example app listening on port 3000!'))
+app.listen(process.env.PORT || 4000, () => console.log('Example app listening on port 4000!'))
 
 
 function createOrder(data) {
