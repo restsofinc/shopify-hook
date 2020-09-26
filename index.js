@@ -12,6 +12,10 @@ app.use(bodyParser.urlencoded({
   extended: true,
 }));
 
+app.get('/', (req, res) => {
+  res.status(200).send('Welcome to Shopify plugin');
+})
+
 app.post('/webhooks/order/create', async (req, res) => {
   console.log('🎉 We got an order!')
   if(req.custom_shopify_verified){
