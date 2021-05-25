@@ -99,7 +99,7 @@ app.listen(process.env.PORT || 4000, () => console.log('Example app listening on
 
 function verify_webhook(hmac, rawBody) {
   // Retrieving the key
-  const key = '3f38052e9fb684815de722c28b633809fc1e11e11124c86d41794229a09f8f4c';
+  const key = '3f38052e9fb684815de722c28b633809fc1e11e11124c86d41794229a09f8f4c ';
   /* Compare the computed HMAC digest based on the shared secret 
    * and the request contents
   */
