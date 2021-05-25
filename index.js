@@ -66,20 +66,20 @@ app.listen(process.env.PORT || 4000, () => console.log('Example app listening on
 
  function createOrder(data) {
 
-  let payload = {
-    username: 'TestTest',
-     password: 'Test#!',
-     ordernumber: 1,
-     shipto: 'John',
-     shipstreet: 'Street 2 near berlin road ',
-     shipaddress: 'r-33 testing address',
-     shipcity: 'Berlin',
-     postcode: '5677',
-     countrycode: 'PK',
-     email: 'test@yopmail.com',
-     servicecode: 'A',
-    productcode:'[2331:5]',
-   }
+  // let payload = {
+  //   username: 'TestTest',
+  //   password: 'Test#!',
+  //   ordernumber: 1,
+  //   shipto: 'John',
+  //   shipstreet: 'Street 2 near berlin road ',
+  //   shipaddress: 'r-33 testing address',
+  //   shipcity: 'Berlin',
+  //   postcode: '5677',
+  //   countrycode: 'PK',
+  //   email: 'test@yopmail.com',
+  //   servicecode: 'A'
+  //   // productcode:'[2331:5]',
+  // }
 
   const options = {
     headers: { 'content-type': 'application/x-www-form-urlencoded;charset=utf-8' }
