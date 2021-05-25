@@ -1,12 +1,12 @@
 const express = require('express')
 const bodyParser = require('body-parser');
-const getRawBody = require('raw-body')
-const crypto = require('crypto')
-const secretKey = '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'
-var request = require('request');
+const getRawBody = require('raw-body');
+const crypto = require('crypto');
 const path = require('path');
-
+const axios = require('axios');
+const qs = require('qs')
 const app = express()
+const url = 'http://repalog.logicwarehouse.net/api/warehouse/apirequest/requestData';
 
 
 app.use(bodyParser.json({ verify: verify_webhook_request }));
@@ -14,7 +14,8 @@ app.use(bodyParser.urlencoded({
   extended: true,
 }));
 
-app.get('/', function(req, res) {
+app.get('/', function (req, res) {
+  createOrder();
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
@@ -25,70 +26,72 @@ app.get('/test', (req, res) => {
 
 app.post('/webhooks/order/create', async (req, res) => {
   console.log('🎉 We got an order!')
-  if(req.custom_shopify_verified){
-      console.log('verify')
-  }else{
+  if (req.custom_shopify_verified) {
+    console.log('verify')
+     const data = req.body;
+     console.log('data',data);
+
+    let order = {};
+     order.ordernumber = data.order_number;
+    if (data.hasOwnProperty("shipping_address")) {
+      order.username = 'TestTest',
+      order.password = 'Test#!',
+      order.shipto = data.shipping_address.name;
+      order.shipaddress = data.shipping_address.address1;
+      order.shipstreet = data.shipping_address.address1;
+      order.shipcity = data.shipping_address.city;
+      order.postcode = data.shipping_address.zip;
+      order.countrycode = data.shipping_address.country_code;
+    }
+    if(data.hasOwnProperty("line_items")){
+      let productCode = data['line_items'][0].product_id;
+      let quantity = data['line_items'][0].quantity;
+      let keys = `${productCode}:${quantity}`;
+      order.productcode = [keys];
+    }
+     order.email = data.email;
+     order.servicecode = 'A';
+
+    console.log('order',order);
+    createOrder(order);
+
+  } else {
     console.log('not verify')
   }
-  
-  // const theData = req.body;
-  // console.log('data',theData);
-  //createOrder();
-  // We'll compare the hmac to our own hash
-  // const hmac = req.get('X-Shopify-Hmac-Sha256')
-  // console.log('hmac', hmac);
-  // // Use raw-body to get the body (buffer)
-  // const body = await getRawBody(req)
 
-  // console.log('body', body);
-  // Create a hash using the body and our key
-  // const hash = crypto
-  //   .createHmac('sha256', secretKey)
-  //   .update(body, 'utf8', 'hex')
-  //   .digest('base64')
-
-  // console.log('hash', hash);
-  // // Compare our hash to Shopify's hash
-  // if (hash === hmac) {
-  //   // It's a match! All good
-  //   console.log('Phew, it came from Shopify!')
-  //   res.sendStatus(200)
-  // } else {
-  //   // No match! This request didn't originate from Shopify
-  //   console.log('Danger! Not from Shopify!')
-  //   res.sendStatus(403)
-  // }
-
-  //res.sendStatus(200)
 })
 
 app.listen(process.env.PORT || 4000, () => console.log('Example app listening on port 4000!'))
 
 
-function createOrder(data) {
+ function createOrder(data) {
 
   let payload = {
     username: 'TestTest',
-    password:'Test#!',
-    ordernumber: 1,
-    shipto: 'John',
-    shipstreet: 'Street 2 near berlin road ',
-    shipaddress: 'r-33 testing address',
-    shipcity: 'Berlin',
-    postcode: '5677',
-    countrycode: 'PK',
-    email : 'test@yopmail.com',
-    servicecode: 'A',
+     password: 'Test#!',
+     ordernumber: 1,
+     shipto: 'John',
+     shipstreet: 'Street 2 near berlin road ',
+     shipaddress: 'r-33 testing address',
+     shipcity: 'Berlin',
+     postcode: '5677',
+     countrycode: 'PK',
+     email: 'test@yopmail.com',
+     servicecode: 'A',
     productcode:'[2331:5]',
-  }
+   }
 
-  console.log('calling api')
-  request.post('http://repalog.logicwarehouse.net/api/warehouse/apirequest/requestData', function (error, response, payload) {
-    if (!error && response.statusCode == 200) {
-        console.log('sucss',response);
-        // console.log('error',error) // Print the google web page.
-     }
-})
+  const options = {
+    headers: { 'content-type': 'application/x-www-form-urlencoded;charset=utf-8' }
+  };
+
+  axios.post(url, qs.stringify(data), options)
+    .then((response) => {
+      console.log('response',response);
+      return response;
+    }, (error) => {
+      console.log('error', error);
+    });
 
 }
 
@@ -101,10 +104,10 @@ function verify_webhook(hmac, rawBody) {
    * and the request contents
   */
   const hash = crypto
-        .createHmac('sha256', key)
-        .update(rawBody, 'utf8', 'hex')
-        .digest('base64');
-  return(hmac === hash);
+    .createHmac('sha256', key)
+    .update(rawBody, 'utf8', 'hex')
+    .digest('base64');
+  return (hmac === hash);
 }
 
 
